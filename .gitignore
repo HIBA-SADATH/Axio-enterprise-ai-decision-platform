@@ -1,0 +1,19 @@
+# Python
+venv/
+.venv/
+__pycache__/
+*.py[cod]
+db.sqlite3
+
+# Secrets
+.env
+.env.*
+
+# Node.js
+node_modules/
+frontend/dist/
+
+# Editor and system files
+.vscode/
+.DS_Store
+Thumbs.db
