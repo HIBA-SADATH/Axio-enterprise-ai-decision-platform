@@ -1,0 +1,18 @@
+Sub-Category,Total_Sales,Total_Profit,Loss_Records,Profit_Margin_Percent,Business_Risk_Level,Business_Risk_Explanation
+Tables,206965.53,-17725.48,203,-8.56,High,Negative total profit
+Bookcases,114880.0,-3472.56,109,-3.02,High,Negative total profit
+Supplies,46673.54,-1189.1,33,-2.55,High,Negative total profit
+Fasteners,3024.28,949.52,12,31.4,Low,Positive profit margin of at least 5%
+Labels,12444.91,5526.38,0,44.41,Low,Positive profit margin of at least 5%
+Art,27107.03,6524.61,0,24.07,Low,Positive profit margin of at least 5%
+Envelopes,16476.4,6964.18,0,42.27,Low,Positive profit margin of at least 5%
+Furnishings,91683.02,13052.72,167,14.24,Low,Positive profit margin of at least 5%
+Appliances,107532.16,18138.01,67,16.87,Low,Positive profit margin of at least 5%
+Storage,223843.61,21278.83,161,9.51,Low,Positive profit margin of at least 5%
+Chairs,327777.76,26567.13,234,8.11,Low,Positive profit margin of at least 5%
+Binders,203409.17,30228.0,612,14.86,Low,Positive profit margin of at least 5%
+Paper,78224.14,33944.24,0,43.39,Low,Positive profit margin of at least 5%
+Accessories,167380.32,41936.64,91,25.05,Low,Positive profit margin of at least 5%
+Phones,330007.05,44515.73,136,13.49,Low,Positive profit margin of at least 5%
+Copiers,149528.03,55617.82,0,37.2,Low,Positive profit margin of at least 5%
+Machines,189238.63,3384.76,44,1.79,Medium,Low profit margin below 5%
