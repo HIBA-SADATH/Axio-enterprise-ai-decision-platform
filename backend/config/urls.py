@@ -25,9 +25,8 @@ def home(request):
         "status": "Django backend is working"
     })
 
-
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("api/risk/", include("risk.urls")),
- 
+    path("api/copilot/", include("copilot.urls")),
 ]

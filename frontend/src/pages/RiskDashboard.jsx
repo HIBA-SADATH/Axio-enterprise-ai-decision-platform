@@ -2,6 +2,7 @@
 import { useCallback, useEffect, useState } from "react";
 import RiskRecords from "../components/RiskRecords";
 import RiskAlerts from "../components/RiskAlerts";
+import { NavLink,useNavigate } from "react-router-dom";
 import BusinessRisk from "../components/BusinessRisk";
 import "./RiskDashboard.css";
 
@@ -32,6 +33,8 @@ const formatPercent = (value) =>
   `${Number(value ?? 0).toFixed(1)}%`;
 
 function RiskDashboard() {
+  const navigate = useNavigate();
+
   const [activePage, setActivePage] = useState("Overview");
   const [summary, setSummary] = useState(null);
   const [error, setError] = useState("");
@@ -139,16 +142,26 @@ function RiskDashboard() {
     <div className="dashboard">
       <aside className="sidebar">
         <div className="brand">
-          <div className="brand-mark">R</div>
+          <div className="brand-icon">✦</div>
           <div>
-            <h2>RiskIQ</h2>
+            <h2>AXIO</h2>
             <p className="sidebar-label">INTELLIGENCE PLATFORM</p>
           </div>
         </div>
 
-        <p className="nav-heading">WORKSPACE</p>
+       
+<p className="nav-heading">WORKSPACE</p>
 
-        <nav>
+<nav>
+  <button
+    type="button"
+    className="risk-back-button"
+    onClick={() => navigate("/")}
+  >
+    ← Back to Main Dashboard
+  </button>
+
+
           <button
             className={`nav-item ${
               activePage === "Overview" ? "active" : ""

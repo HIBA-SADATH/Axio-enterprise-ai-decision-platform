@@ -63,7 +63,8 @@ function Dashboard() {
             Explore your business through four connected intelligence modules.
           </p>
         </div>
-        <div className="banner-symbol">A</div>
+        <div className="banner-symbol">✦</div>
+        
       </section>
 
       <section className="section-heading">
