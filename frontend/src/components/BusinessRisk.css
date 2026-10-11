@@ -1,0 +1,54 @@
+/*
+  Most styles used by this page (stat cards, panel, badges, table, error and
+  loading states) already live in index.css and RiskDashboard.css.
+  This file only adds what is specific to the Business Risk page.
+*/
+
+.business-risk-page {
+  min-width: 0;
+}
+
+/* Table */
+
+.business-risk-table {
+  width: 100%;
+  min-width: 850px;
+}
+
+.business-risk-table th,
+.business-risk-table td {
+  vertical-align: top;
+}
+
+/* Numbers line up on the right */
+.business-risk-table th:nth-child(2),
+.business-risk-table th:nth-child(3),
+.business-risk-table th:nth-child(4),
+.business-risk-table td:nth-child(2),
+.business-risk-table td:nth-child(3),
+.business-risk-table td:nth-child(4) {
+  text-align: right;
+}
+
+/* Sub-category name stands out */
+.business-risk-table td:first-child {
+  font-weight: 600;
+}
+
+/* Explanation can wrap instead of stretching the table */
+.business-risk-table td:last-child {
+  min-width: 280px;
+  max-width: 420px;
+  color: var(--muted);
+  white-space: normal;
+  line-height: 1.5;
+}
+
+/* Note under the table */
+.business-risk-note {
+  margin: 16px 0 0;
+  padding: 0;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.6;
+}

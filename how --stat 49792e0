@@ -1,0 +1,13 @@
+*   [33mffb8f50[m[33m ([m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m)[m Merge pull request #3 from HIBA-SADATH/feature/sales-demand-intelligence
+[31m|[m[32m\[m  
+[31m|[m * [33m49792e0[m[33m ([m[1;31morigin/feature/sales-demand-intelligence[m[33m)[m Add sales intelligence dashboard frontend
+* [32m|[m [33mc727190[m[33m ([m[1;32mmain[m[33m)[m Merge pull request #2 from HIBA-SADATH/feature/sales-demand-intelligence
+[33m|[m[32m\[m[32m|[m 
+[33m|[m * [33ma9ad572[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mfeature/sales-demand-intelligence[m[33m)[m Add sales demand intelligence APIs
+[33m|[m[33m/[m  
+*   [33m8c05e71[m Merge pull request #1 from HIBA-SADATH/feature/member4-ai-decision
+[35m|[m[36m\[m  
+[35m|[m * [33m9b6165c[m[33m ([m[1;31morigin/feature/member4-ai-decision[m[33m)[m Finalize Axio dashboard and navigation
+[35m|[m[35m/[m  
+* [33mcaf5025[m Add Axio backend and frontend
+* [33m9a1d158[m Initialize Axio project structure
