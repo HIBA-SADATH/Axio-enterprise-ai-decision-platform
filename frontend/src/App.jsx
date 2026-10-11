@@ -1,5 +1,5 @@
 
-import { BrowserRouter, Routes, Route, Navigate, NavLink } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate, NavLink ,useLocation} from "react-router-dom";
  
 import Dashboard from "./pages/Dashboard";
 import CustomerDashboard from "./pages/CustomerDashboard";
@@ -21,9 +21,9 @@ function Sidebar() {
   return (
     <aside className="sidebar">
       <div className="brand">
-        <div className="brand-icon">A</div>
+        <div className="brand-icon">✦</div>
         <div>
-          <h2>Analytics</h2>
+          <h2>AXIO</h2>
           <span>Business intelligence</span>
         </div>
       </div>
@@ -53,11 +53,60 @@ function Sidebar() {
     </aside>
   );
 }
- 
+
 function AppLayout() {
+  const location = useLocation();
+  const isDecisionPage = location.pathname.startsWith("/decisions");
+
   return (
     <div className="app-layout">
-      <Sidebar />
+      {isDecisionPage ? (
+        <aside className="sidebar">
+          <div className="brand">
+            <div className="brand-icon">✦</div>
+            <div>
+              <h2>AXIO</h2>
+              <span></span>
+            </div>
+          </div>
+
+          <p className="menu-heading">AI Intelligence</p>
+
+          <nav className="sidebar-nav" aria-label="Decision Intelligence navigation">
+            <NavLink to="/" end className="nav-item">
+              ← Main Dashboard
+            </NavLink>
+
+            <NavLink to="/decisions" end className="nav-item">
+              Overview
+            </NavLink>
+
+            <a className="nav-item" href="/decisions#copilot">
+              AI Executive Copilot
+            </a>
+            <a className="nav-item" href="/decisions#rag">
+              RAG Document Assistant
+            </a>
+            <a className="nav-item" href="/decisions#what-if">
+              What-If Simulator
+            </a>
+            <a className="nav-item" href="/decisions#recommendations">
+              Decision Recommendations
+            </a>
+            <a className="nav-item" href="/decisions#optimizer">
+              Discount Scenario Optimizer
+            </a>
+          </nav>
+
+          <div className="sidebar-footer">
+            <span className="status-dot" />
+            AI services workspace
+          </div>
+        </aside>
+      ) : (
+        <Sidebar />
+      )}
+
       <main className="main-content">
         <Routes>
           <Route path="/" element={<Dashboard />} />
@@ -71,6 +120,10 @@ function AppLayout() {
     </div>
   );
 }
+
+
+
+
  
 function App() {
   return (

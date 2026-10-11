@@ -1,0 +1,7 @@
+﻿Enterprise Business Report
+
+The Technology category generated the highest sales and profit in the business dataset.
+Office Supplies generated less profit than Technology.
+Furniture had the lowest profit among the three product categories.
+The business can improve profitability by monitoring discounts and identifying products with low profit margins.
+A decision support system can use sales, profit, quantity, and discount information to help managers make better decisions.
