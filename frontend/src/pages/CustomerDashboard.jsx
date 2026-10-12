@@ -109,14 +109,7 @@ function CustomerDashboard() {
           </p>
         </div>
 
-        <div className={`customer-status ${apiStatus}`}>
-          <span className="status-dot" />
-          {apiStatus === "connected"
-            ? "Backend connected"
-            : apiStatus === "loading"
-              ? "Connecting..."
-              : "Demo data"}
-        </div>
+    
       </header>
 
       
