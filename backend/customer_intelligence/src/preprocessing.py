@@ -1,20 +1,4 @@
-# src/preprocessing.py
-"""
-Phase 3 – Data Split & Preprocessing
 
-This module performs the following steps:
-1. Load the verified `customer_features.csv`.
-2. Define `X` (the 14 approved predictive features) and `y` (`Churn`).
-3. Create a reproducible stratified 80/20 train‑test split (`random_state=42`).
-4. Build a scikit‑learn preprocessing pipeline:
-   - One‑hot encode categorical columns (`handle_unknown='ignore'`).
-   - Scale numeric columns with `StandardScaler` (suitable for linear models).
-   - The pipeline is fitted **only on the training data** to avoid leakage.
-5. Expose helper functions to retrieve the split datasets and the fitted transformer.
-
-The script is intentionally lightweight – it does not train any model. It simply
-prepares the data for downstream modeling stages.
-"""
 
 import os
 from pathlib import Path
