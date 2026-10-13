@@ -1,0 +1,1 @@
+"""Customer Intelligence Django application."""
