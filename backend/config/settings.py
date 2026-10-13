@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'sales',
     'risk',
     'copilot',
+    'customer_intelligence',
 
 ]
 

@@ -1,288 +1,69 @@
-import React, { useEffect, useState } from "react";
-import "./customerDashboard.css";
+import { useCallback, useEffect, useState } from "react";
+import { Bar, BarChart, CartesianGrid, Cell, Legend, Pie, PieChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
+import "./CustomerDashboard.css";
 
-const initialCustomers = [
-  { id: 1, name: "Customer A", segment: "High Value", risk: "Low", spend: 24500, discount: "5%" },
-  { id: 2, name: "Customer B", segment: "At Risk", risk: "High", spend: 8200, discount: "15%" },
-  { id: 3, name: "Customer C", segment: "Regular", risk: "Medium", spend: 12600, discount: "10%" },
-  { id: 4, name: "Customer D", segment: "High Value", risk: "Low", spend: 31200, discount: "5%" },
-  { id: 5, name: "Customer E", segment: "At Risk", risk: "High", spend: 6500, discount: "20%" },
-  { id: 6, name: "Customer F", segment: "Regular", risk: "Medium", spend: 14300, discount: "10%" },
-];
-
-const segmentColors = {
-  "High Value": "#8b7cff",
-  Regular: "#23c9b7",
-  "At Risk": "#ff7185",
-};
+const API_URL = "http://127.0.0.1:8000/api/customers/summary/";
+const SEGMENT_COLORS = ["#1d5fc4", "#5b4bb0", "#1b8a5a"];
+const formatNumber = (value) => Number(value ?? 0).toLocaleString("en-IN");
+const formatCurrency = (value) => Number(value ?? 0).toLocaleString("en-IN", { style: "currency", currency: "USD", maximumFractionDigits: 0 });
+const formatPercent = (value) => `${Number(value ?? 0).toFixed(1)}%`;
 
 function CustomerDashboard() {
-  const [customers, setCustomers] = useState(initialCustomers);
-  const [search, setSearch] = useState("");
-  const [segment, setSegment] = useState("All");
-  const [apiStatus, setApiStatus] = useState("demo");
+  const [summary, setSummary] = useState(null);
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(true);
+  const [lastUpdated, setLastUpdated] = useState(null);
 
-  // Optional API integration.
-  // Set VITE_CUSTOMER_API_URL in your frontend .env file when the backend is ready.
-  useEffect(() => {
-    const apiUrl = import.meta.env.VITE_CUSTOMER_API_URL;
-
-    if (!apiUrl) return;
-
-    const controller = new AbortController();
-
-    async function loadCustomers() {
-      try {
-        setApiStatus("loading");
-
-        const response = await fetch(apiUrl, {
-          signal: controller.signal,
-        });
-
-        if (!response.ok) {
-          throw new Error("Customer API request failed");
-        }
-
-        const data = await response.json();
-        const rows = Array.isArray(data) ? data : data.customers;
-
-        if (!Array.isArray(rows)) {
-          throw new Error("Unexpected customer API response");
-        }
-
-        setCustomers(rows);
-        setApiStatus("connected");
-      } catch (error) {
-        if (error.name !== "AbortError") {
-          console.error("Customer dashboard:", error);
-          setApiStatus("on progress");
-        }
-      }
+  const loadSummary = useCallback(async () => {
+    setLoading(true);
+    setError("");
+    try {
+      const response = await fetch(API_URL);
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error || "Unable to load customer analysis.");
+      setSummary(data);
+      setLastUpdated(new Date());
+    } catch (requestError) {
+      setError(requestError.message || "Could not connect to Django. Check that the backend server is running.");
+    } finally {
+      setLoading(false);
     }
-
-    loadCustomers();
-
-    return () => controller.abort();
   }, []);
 
-  const filteredCustomers = customers.filter((customer) => {
-    const matchesSearch = String(customer.name ?? "")
-      .toLowerCase()
-      .includes(search.toLowerCase());
+  useEffect(() => {
+    const requestTimer = window.setTimeout(loadSummary, 0);
+    return () => window.clearTimeout(requestTimer);
+  }, [loadSummary]);
 
-    const matchesSegment =
-      segment === "All" || customer.segment === segment;
+  const statCards = [
+    ["Customer accounts", summary ? formatNumber(summary.total_customers) : "—", "Historical records analysed", "◉"],
+    ["Total sales", summary ? formatCurrency(summary.total_sales) : "—", "Across the customer dataset", "$"],
+    ["Labeled churn accounts", summary ? formatNumber(summary.churned_customers) : "—", summary ? `${formatPercent(summary.churn_rate)} of records` : "Historical churn label", "!"],
+    ["Average sales per account", summary ? formatCurrency(summary.average_sales_per_customer) : "—", "Mean historical sales", "↗"],
+  ];
 
-    return matchesSearch && matchesSegment;
-  });
+  return <div className="customer-dashboard">
+    <header className="customer-header">
+      <div><p className="eyebrow">ENTERPRISE AI / CUSTOMER ANALYTICS</p><h1>Customer Intelligence</h1><p>Customer behavior analysis and churn-label insights from the available dataset.</p></div>
+      <div className="customer-header-actions"><span className="customer-status"><span className="status-dot" />{error ? "BACKEND OFFLINE" : "DATASET CONNECTED"}</span><button className="refresh-button" type="button" onClick={loadSummary} disabled={loading}>{loading ? "Loading…" : "↻ Refresh"}</button></div>
+    </header>
 
-  const totalSpend = customers.reduce(
-    (sum, customer) => sum + (Number(customer.spend) || 0),
-    0
-  );
+    {error && <section className="customer-error" role="alert"><div><strong>Customer analysis could not be loaded.</strong><p>{error}</p></div><button type="button" onClick={loadSummary}>Try again</button></section>}
+    <section className="customer-stats" aria-label="Customer statistics">{statCards.map(([label, value, detail, icon]) => <article className="customer-stat-card" key={label}><div className="customer-stat-top"><span>{label}</span><span className="customer-stat-icon">{icon}</span></div><strong>{value}</strong><small>{detail}</small></article>)}</section>
 
-  const highRisk = customers.filter(
-    (customer) => customer.risk === "High"
-  ).length;
-
-  const highValue = customers.filter(
-    (customer) => customer.segment === "High Value"
-  ).length;
-
-  const segments = ["High Value", "Regular", "At Risk"];
-
-  const formatCurrency = (amount) =>
-    new Intl.NumberFormat("en-IN", {
-      style: "currency",
-      currency: "INR",
-      maximumFractionDigits: 0,
-    }).format(amount);
-
-  return (
-    <main className="customer-dashboard">
-      <header className="customer-header">
-        <div>
-          <p className="customer-eyebrow">AXIO / CUSTOMER INTELLIGENCE</p>
-          <h1>Customer Dashboard</h1>
-          <p className="customer-subtitle">
-            Understand customers, identify risk, and discover opportunities.
-          </p>
-        </div>
-
-    
-      </header>
-
-      
-
-      <section className="customer-kpi-grid">
-        <article className="customer-kpi">
-          <span className="kpi-label">Total Customers</span>
-          <strong>{customers.length.toLocaleString("en-IN")}</strong>
-          <span className="kpi-note">Customers in current dataset</span>
-        </article>
-
-        <article className="customer-kpi">
-          <span className="kpi-label">Total Customer Spend</span>
-          <strong>{formatCurrency(totalSpend)}</strong>
-          <span className="kpi-note">Sum of spend in this dataset</span>
-        </article>
-
-        <article className="customer-kpi">
-          <span className="kpi-label">High-Value Customers</span>
-          <strong>{highValue}</strong>
-          <span className="kpi-note">Customers in high-value segment</span>
-        </article>
-
-        <article className="customer-kpi">
-          <span className="kpi-label">High-Risk Customers</span>
-          <strong className="risk-number">{highRisk}</strong>
-          <span className="kpi-note">Require attention</span>
-        </article>
+    {loading && !summary ? <section className="customer-loading"><span />Loading customer analytics…</section> : summary && <>
+      <section className="customer-chart-grid">
+        <article className="customer-panel"><div className="customer-panel-heading"><div><h2>Customer segments</h2><p>Distribution of customer accounts by segment</p></div></div><ResponsiveContainer width="100%" height={300}><PieChart><Pie data={summary.segment_breakdown} dataKey="customers" nameKey="name" innerRadius={72} outerRadius={108} paddingAngle={3}>{summary.segment_breakdown.map((entry, index) => <Cell key={entry.name} fill={SEGMENT_COLORS[index % SEGMENT_COLORS.length]} />)}</Pie><Tooltip formatter={(value) => [formatNumber(value), "Accounts"]} /><Legend /></PieChart></ResponsiveContainer></article>
+        <article className="customer-panel"><div className="customer-panel-heading"><div><h2>Churn label rate by region</h2><p>Observed historical churn labels, not live model predictions</p></div></div><ResponsiveContainer width="100%" height={300}><BarChart data={summary.region_breakdown} margin={{ top: 8, right: 8, left: -18 }}><CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#dfe4ec" /><XAxis dataKey="name" tickLine={false} axisLine={false} /><YAxis tickFormatter={(value) => `${value}%`} tickLine={false} axisLine={false} /><Tooltip formatter={(value) => [formatPercent(value), "Churn label rate"]} /><Bar dataKey="churn_rate" name="Churn label rate" fill="#d03a55" radius={[5, 5, 0, 0]} /></BarChart></ResponsiveContainer></article>
       </section>
-
-      <section className="customer-panel">
-        <div className="customer-section-heading">
-          <div>
-            <h2>Customer Segments</h2>
-            <p>Distribution across the current dataset</p>
-          </div>
-        </div>
-
-        <div className="customer-segment-grid">
-          {segments.map((item) => {
-            const count = customers.filter(
-              (customer) => customer.segment === item
-            ).length;
-
-            const percentage = customers.length
-              ? Math.round((count / customers.length) * 100)
-              : 0;
-
-            return (
-              <article className="segment-card" key={item}>
-                <div className="segment-card-top">
-                  <span
-                    className="segment-indicator"
-                    style={{ backgroundColor: segmentColors[item] }}
-                  />
-                  <span>{item}</span>
-                </div>
-
-                <strong>{count}</strong>
-                <div className="segment-progress">
-                  <span
-                    style={{
-                      width: `${percentage}%`,
-                      backgroundColor: segmentColors[item],
-                    }}
-                  />
-                </div>
-                <small>{percentage}% of customers</small>
-              </article>
-            );
-          })}
-        </div>
+      <section className="customer-chart-grid">
+        <article className="customer-panel"><div className="customer-panel-heading"><div><h2>Sales by category</h2><p>Total historical sales for each product category</p></div></div><ResponsiveContainer width="100%" height={300}><BarChart data={summary.sales_by_category} layout="vertical" margin={{ top: 5, right: 18, left: 25, bottom: 5 }}><CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="#dfe4ec" /><XAxis type="number" tickFormatter={(value) => `$${Math.round(value / 1000)}k`} tickLine={false} axisLine={false} /><YAxis dataKey="name" type="category" width={105} tickLine={false} axisLine={false} /><Tooltip formatter={(value) => [formatCurrency(value), "Sales"]} /><Bar dataKey="sales" name="Sales" fill="#1d5fc4" radius={[0, 5, 5, 0]} /></BarChart></ResponsiveContainer></article>
+        <article className="customer-panel"><div className="customer-panel-heading"><div><h2>Highest-risk product areas</h2><p>Sub-categories ranked by observed churn-label rate</p></div></div><div className="customer-risk-list">{summary.highest_risk_subcategories.map((item) => <div className="customer-risk-row" key={item.name}><div><strong>{item.name}</strong><span>{formatNumber(item.customers)} accounts</span></div><div className="customer-risk-rate"><strong>{formatPercent(item.churn_rate)}</strong><div><span style={{ width: `${Math.min(item.churn_rate, 100)}%` }} /></div></div></div>)}</div></article>
       </section>
-
-      <section className="customer-panel">
-        <div className="customer-section-heading customer-table-heading">
-          <div>
-            <h2>Customer Insights</h2>
-            <p>Search and filter customer profiles</p>
-          </div>
-
-          <div className="customer-filters">
-            <input
-              type="search"
-              placeholder="Search customers..."
-              value={search}
-              onChange={(event) => setSearch(event.target.value)}
-              aria-label="Search customers"
-            />
-
-            <select
-              value={segment}
-              onChange={(event) => setSegment(event.target.value)}
-              aria-label="Filter customer segment"
-            >
-              <option value="All">All segments</option>
-              {segments.map((item) => (
-                <option value={item} key={item}>
-                  {item}
-                </option>
-              ))}
-            </select>
-          </div>
-        </div>
-
-        <div className="customer-table-wrapper">
-          <table className="customer-table">
-            <thead>
-              <tr>
-                <th>Customer</th>
-                <th>Segment</th>
-                <th>Risk Level</th>
-                <th>Total Spend</th>
-                <th>Suggested Discount</th>
-              </tr>
-            </thead>
-
-            <tbody>
-              {filteredCustomers.map((customer) => (
-                <tr key={customer.id}>
-                  <td>
-                    <div className="customer-name">
-                      <span className="customer-avatar">
-                        {String(customer.name ?? "?").charAt(0).toUpperCase()}
-                      </span>
-                      {customer.name}
-                    </div>
-                  </td>
-
-                  <td>
-                    <span
-                      className="customer-segment-badge"
-                      style={{
-                        color: segmentColors[customer.segment] || "#a8b2c8",
-                      }}
-                    >
-                      {customer.segment ?? "Unknown"}
-                    </span>
-                  </td>
-
-                  <td>
-                    <span
-                      className={`customer-risk-badge ${String(
-                        customer.risk ?? "unknown"
-                      ).toLowerCase()}`}
-                    >
-                      {customer.risk ?? "Unknown"}
-                    </span>
-                  </td>
-
-                  <td>{formatCurrency(Number(customer.spend) || 0)}</td>
-                  <td>{customer.discount ?? "—"}</td>
-                </tr>
-              ))}
-
-              {filteredCustomers.length === 0 && (
-                <tr>
-                  <td colSpan="5" className="customer-empty">
-                    No customers match your search.
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-        </div>
-      </section>
-
-      <footer className="customer-footer">
-        AXIO CUSTOMER INTELLIGENCE
-        <span>Insights depend on the connected dataset.</span>
-      </footer>
-    </main>
-  );
+      <section className="customer-panel customer-table-panel"><div className="customer-panel-heading"><div><h2>Segment performance</h2><p>Customer account count, historical sales, and observed churn labels</p></div></div><div className="customer-table-wrap"><table><thead><tr><th>Segment</th><th>Accounts</th><th>Sales</th><th>Labeled churn</th><th>Churn rate</th></tr></thead><tbody>{summary.segment_breakdown.map((item) => <tr key={item.name}><td>{item.name}</td><td>{formatNumber(item.customers)}</td><td>{formatCurrency(item.sales)}</td><td>{formatNumber(item.churned_customers)}</td><td>{formatPercent(item.churn_rate)}</td></tr>)}</tbody></table></div></section>
+      <p className="customer-data-note">{summary.data_note} {lastUpdated && `Last refreshed ${lastUpdated.toLocaleTimeString("en-IN")}.`}</p>
+    </>}
+  </div>;
 }
 
 export default CustomerDashboard;
